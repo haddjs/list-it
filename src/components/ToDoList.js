@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import useLocalStorage from "@/hooks/useLocalStorage";
+
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
 
 const ToDoList = () => {
-	const [todos, setTodos] = useState([]);
+	const [todos, setTodos] = useLocalStorage("list-it-todos", []);
 	const [newTodo, setNewTodo] = useState("");
 
 	const handleNewTodo = (e) => {
