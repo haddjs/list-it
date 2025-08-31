@@ -96,6 +96,26 @@ const ToDoList = () => {
 		);
 	};
 
+	const handleUpdateComplete = (groupId, updatedListId) => {
+		setGroups((prevGroups) =>
+			prevGroups.map((group) => {
+				if (group.id !== groupId) return group;
+
+				return {
+					...group,
+					todos: group.todos.map((todo) => {
+						if (todo.id !== updatedListId) return todo;
+
+						return {
+							...todo,
+							isComplete: !todo.isComplete,
+						};
+					}),
+				};
+			})
+		);
+	};
+
 	return (
 		<>
 			<div className="flex">
@@ -152,7 +172,16 @@ const ToDoList = () => {
 							{item.todos?.map((todo) => (
 								<div key={todo.id} className="py-4">
 									<p className="p-4 rounded-xl bg-zinc-200 text-xl break-words whitespace-normal flex justify-between items-center">
-										{todo.task}
+										<Checkbox
+											checked={todo.isComplete}
+											onCheckedChange={() =>
+												handleUpdateComplete(item.id, todo.id)
+											}
+											className="cursor-pointer"
+										/>
+										<p className={todo.isComplete ? "line-through" : ""}>
+											{todo.task}
+										</p>
 										<Button
 											onClick={() => handleDeleteTodo(item.id, todo.id)}
 											className="cursor-pointer">
