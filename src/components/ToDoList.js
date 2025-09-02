@@ -2,7 +2,7 @@
 
 import useLocalStorage from "@/hooks/useLocalStorage";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
@@ -15,6 +15,8 @@ import {
 	DialogContent,
 	DialogClose,
 } from "./ui/dialog";
+import { Separator } from "./ui/separator";
+import { Trash2, ShredderIcon } from "lucide-react";
 
 const ToDoList = () => {
 	const [groupTitle, setGroupTitle] = useState("");
@@ -96,6 +98,12 @@ const ToDoList = () => {
 		);
 	};
 
+	const handleDeleteGroup = (groupId) => {
+		setGroups((prevGroups) =>
+			prevGroups.filter((group) => group.id !== groupId)
+		);
+	};
+
 	const handleUpdateComplete = (groupId, updatedListId) => {
 		setGroups((prevGroups) =>
 			prevGroups.map((group) => {
@@ -121,7 +129,7 @@ const ToDoList = () => {
 			<div className="flex">
 				<Dialog>
 					<DialogTrigger asChild>
-						<Button variant="default" className="cursor-pointer">
+						<Button variant="default" className="cursor-pointer p-7 text-lg">
 							Add New Group
 						</Button>
 					</DialogTrigger>
@@ -148,52 +156,76 @@ const ToDoList = () => {
 				</Dialog>
 			</div>
 
-			<div className="grid grid-cols-4 justify-center py-5 gap-4">
-				{groups.map((item) => (
-					<Card key={item.id}>
-						<CardHeader>{item.title}</CardHeader>
-						<CardContent>
-							<form
-								onSubmit={(e) => {
-									e.preventDefault();
-									addToGroup(item.id);
-								}}
-								className="flex gap-2">
-								<Input
-									type="text"
-									value={groupInput[item.id] || ""}
-									onChange={(e) => handleGroupInput(e.target.value, item.id)}
-									placeholder={`Add a task to ${item.title}`}
-									required
-								/>
-								<Button type="submit">Add</Button>
-							</form>
+			{groups.length === 0 ? (
+				<div className="flex justify-center py-20 text-xl text-black/40">
+					<p>Groups Empty</p>
+				</div>
+			) : (
+				<div className="flex flex-wrap justify-center py-5 gap-7">
+					{groups.map((item) => (
+						<Card key={item.id}>
+							<CardHeader className="flex justify-between items-center pb-3">
+								{item.title}
+								<Button
+									className="cursor-pointer"
+									variant="destructive"
+									onClick={() => handleDeleteGroup(item.id)}>
+									<Trash2 />
+								</Button>
+							</CardHeader>
+							<CardContent>
+								<form
+									onSubmit={(e) => {
+										e.preventDefault();
+										addToGroup(item.id);
+									}}
+									className="flex gap-2">
+									<Input
+										type="text"
+										value={groupInput[item.id] || ""}
+										onChange={(e) => handleGroupInput(e.target.value, item.id)}
+										placeholder={`Add a task to ${item.title}`}
+										required
+									/>
+									<Button type="submit" className="cursor-pointer">
+										Add
+									</Button>
+								</form>
 
-							{item.todos?.map((todo) => (
-								<div key={todo.id} className="py-4">
-									<p className="p-4 rounded-xl bg-zinc-200 text-xl break-words whitespace-normal flex justify-between items-center">
-										<Checkbox
-											checked={todo.isComplete}
-											onCheckedChange={() =>
-												handleUpdateComplete(item.id, todo.id)
-											}
-											className="cursor-pointer"
-										/>
-										<p className={todo.isComplete ? "line-through" : ""}>
-											{todo.task}
-										</p>
-										<Button
-											onClick={() => handleDeleteTodo(item.id, todo.id)}
-											className="cursor-pointer">
-											X
-										</Button>
+								{item.todos.length === 0 ? (
+									<p className="pt-8 text-lg whitespace-normal text-center">
+										List Empty
 									</p>
-								</div>
-							))}
-						</CardContent>
-					</Card>
-				))}
-			</div>
+								) : (
+									item.todos?.map((todo) => (
+										<div key={todo.id} className="pt-4">
+											<p className="pt-5 rounded-xl text-lg break-words whitespace-normal flex justify-between items-center">
+												<Checkbox
+													checked={todo.isComplete}
+													onCheckedChange={() =>
+														handleUpdateComplete(item.id, todo.id)
+													}
+													className="cursor-pointer"
+												/>
+												<p className={todo.isComplete ? "line-through" : ""}>
+													{todo.task}
+												</p>
+												<Button
+													onClick={() => handleDeleteTodo(item.id, todo.id)}
+													className="cursor-pointer"
+													variant="destructive">
+													<ShredderIcon />
+												</Button>
+											</p>
+											<Separator orientation="horizontal" className="my-4" />
+										</div>
+									))
+								)}
+							</CardContent>
+						</Card>
+					))}
+				</div>
+			)}
 		</>
 	);
 };
